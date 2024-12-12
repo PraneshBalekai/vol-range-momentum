@@ -1,10 +1,14 @@
 from __future__ import annotations
-import statsmodels.api as sm
-import pandas as pd
+
 from typing import Tuple
 
+import pandas as pd
+import statsmodels.api as sm
 
-def ols_regression(x: pd.Series, y: pd.Series, with_const: bool = True) -> Tuple[float, float]:
+
+def ols_regression(
+    x: pd.Series, y: pd.Series, with_const: bool = True
+) -> Tuple[float, float]:
     """Perform OLS regression using stats models.
 
     Args:

@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 from typing import Tuple
-from statsmodels.tsa.stattools import adfuller
+
 import pandas as pd
+from statsmodels.tsa.stattools import adfuller
 
 
 def adf_test(s: pd.Series) -> Tuple[float, float]:
@@ -13,7 +15,7 @@ def adf_test(s: pd.Series) -> Tuple[float, float]:
         s (pd.Series): Pandas series usually with datetime index and values
             to test for stationarity
 
-    Returns: 
+    Returns:
         Tstat, Pvalue
     """
     results = adfuller(s)

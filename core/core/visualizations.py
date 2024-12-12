@@ -1,13 +1,16 @@
 from __future__ import annotations
-from matplotlib import pyplot as plt
+
 from typing import Tuple
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+
 from core.analytics import calc_n_period_forward_returns
 from core.linear_regression import ols_regression
 
 
-def plot_ts(ts, ax=None, step=5, figsize=(13,7), title='', see_xaxis=False):
+def plot_ts(ts, ax=None, step=5, figsize=(13, 7), title="", see_xaxis=False):
     """
     plot timeseries ignoring date gaps
     https://stackoverflow.com/questions/58476654/how-to-remove-or-hide-x-axis-labels-from-a-plot
@@ -32,11 +35,13 @@ def plot_ts(ts, ax=None, step=5, figsize=(13,7), title='', see_xaxis=False):
     return ax
 
 
-def plot_ic_decay(signal: pd.DataFrame | pd.Series, 
-                  prices: pd.DataFrame | pd.Series, 
-                  n_periods: list = [1, 2, 3, 4, 5, 10, 15, 20],
-                  figsize: Tuple = (13,7),
-                  ax = None):
+def plot_ic_decay(
+    signal: pd.DataFrame | pd.Series,
+    prices: pd.DataFrame | pd.Series,
+    n_periods: list = [1, 2, 3, 4, 5, 10, 15, 20],
+    figsize: Tuple = (13, 7),
+    ax=None,
+):
     """Given a signal and prices, calculate and plot IC decay over n_periods.
 
     Args:
@@ -60,25 +65,29 @@ def plot_ic_decay(signal: pd.DataFrame | pd.Series,
     plt.grid()
 
 
-def plot_rolling_ic(signal: pd.Series, 
-                    fwd_returns: pd.Series, 
-                    n_periods: list = [12, 75], 
-                    period_labels: list = ["Hourly", "Daily"], 
-                    ):
-    """Given Signal and Forward Returns, plot rolling IC stats for different periods. 
+def plot_rolling_ic(
+    signal: pd.Series,
+    fwd_returns: pd.Series,
+    n_periods: list = [12, 75],
+    period_labels: list = ["Hourly", "Daily"],
+):
+    """Given Signal and Forward Returns, plot rolling IC stats for different periods.
 
     Args:
         signal (pd.Series): DateTime Index and Signal values.
-        fwd_returns (pd.Series): DateTime Index and Forward Return values. 
+        fwd_returns (pd.Series): DateTime Index and Forward Return values.
         n_periods (list, optional): Number of periods to do rolling IC stats on. Defaults to [12, 75].
         period_labels (list, optional): Labels for each period in n_periods. Defaults to ["Hourly", "Daily"].
     """
+
     def calc_rolling_ic(df, period):
         roll_ic = {}
         for window in df.rolling(period):
             if len(window) < period:
                 continue
-            roll_ic[window.index[-1]] = window["signal"].corr(window["fwd_returns"], method="spearman")
+            roll_ic[window.index[-1]] = window["signal"].corr(
+                window["fwd_returns"], method="spearman"
+            )
         return pd.DataFrame().from_dict(roll_ic, orient="index")
 
     sig_res_df = signal.to_frame()
@@ -91,18 +100,17 @@ def plot_rolling_ic(signal: pd.Series,
     for period in n_periods:
         tmp = calc_rolling_ic(sig_res_df, period)
         roll_ic_df = pd.concat([roll_ic_df, tmp], axis=1)
-    
+
     roll_ic_df.columns = period_labels
 
     ax = plot_ts(roll_ic_df)
     ax.axhline(0, color="black")
     ax.axhline(ic, color="green", linestyle="-")
-    ax.text(0, ic, f"{round(ic, 2)}", bbox=dict(boxstyle='square'))
+    ax.text(0, ic, f"{round(ic, 2)}", bbox=dict(boxstyle="square"))
     ax.grid()
 
 
-def plot_signal_response(signal: pd.Series,
-                         fwd_returns: pd.Series):
+def plot_signal_response(signal: pd.Series, fwd_returns: pd.Series):
     """Given Signal and Forward Returns, visualize signal/Response.
 
     Args:
@@ -111,7 +119,7 @@ def plot_signal_response(signal: pd.Series,
     """
     # Prepare subplots
     _, axes = plt.subplots(1, 3, figsize=(20, 7))
-     
+
     # Signal Distribution
     signal.hist(bins=50, ax=axes[0])
     axes[0].set_xlabel("Signal")
@@ -162,4 +170,6 @@ def plot_signal_bucket_characterstics(signal: pd.Series, fwd_returns: pd.Series)
     axes[1].set_xlabel("Forward Returns // Classifed by Signal Deciles")
 
     axes[2].bar(bucket_mean.index, bucket_mean["signal_returns"])
-    axes[2].set_xlabel("Signal Weighted Forward Returns // Classified by Signal Deciles")
+    axes[2].set_xlabel(
+        "Signal Weighted Forward Returns // Classified by Signal Deciles"
+    )

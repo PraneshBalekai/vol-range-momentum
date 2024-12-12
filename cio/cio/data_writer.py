@@ -1,9 +1,11 @@
 from __future__ import annotations
+
+import os.path
 from abc import ABC, abstractmethod
 
-import cio.constants as c
-import os.path
 import pandas as pd
+
+import cio.constants as c
 
 
 class BaseWriter(ABC):
@@ -15,6 +17,7 @@ class BaseWriter(ABC):
                 of the data writer
         """
         self.config = config
+
     @abstractmethod
     def write_data(self):
         pass
@@ -34,18 +37,28 @@ class ParquetWriter(BaseWriter):
         }
     }
     """
-    def write_data(self, data):
-        if 'writer_params' in self.config:
-            if 'append_if_exists' in self.config['writer_params'] and self.config['writer_params']['append_if_exists']:
-                if os.path.isfile(self.config['filename']):
-                    df = pd.read_parquet(self.config['filename'])
-                    data = pd.concat([df, data])
-            if 'sort_index' in self.config['writer_params'] and self.config['writer_params']['sort_index']:
-                data = data.sort_index()
-            if 'deduplicate_index' in self.config['writer_params'] and self.config['writer_params']['deduplicate_index']:
-                data = data[~data.index.duplicated(keep='first')]
 
-        data.to_parquet(self.config['filename'])
+    def write_data(self, data):
+        if "writer_params" in self.config:
+            if (
+                "append_if_exists" in self.config["writer_params"]
+                and self.config["writer_params"]["append_if_exists"]
+            ):
+                if os.path.isfile(self.config["filename"]):
+                    df = pd.read_parquet(self.config["filename"])
+                    data = pd.concat([df, data])
+            if (
+                "sort_index" in self.config["writer_params"]
+                and self.config["writer_params"]["sort_index"]
+            ):
+                data = data.sort_index()
+            if (
+                "deduplicate_index" in self.config["writer_params"]
+                and self.config["writer_params"]["deduplicate_index"]
+            ):
+                data = data[~data.index.duplicated(keep="first")]
+
+        data.to_parquet(self.config["filename"])
 
         return
 

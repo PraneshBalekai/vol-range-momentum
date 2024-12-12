@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import argparse
+import datetime
+import json
+
 import pandas as pd
+from dynaconf import Dynaconf
+
 from cio.data_loader import load_data
 from cio.data_writer import write_data
-from dynaconf import Dynaconf
-import argparse
-import json
-import datetime
 
 parser = argparse.ArgumentParser(description="Path of config file to pass to script")
 parser.add_argument("--config_path", type=str, help="Path to config file")
@@ -58,17 +60,17 @@ def main(config_path: str):
 
     # Load data
     endDateTime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d")
-    dc['endDateTime'] = endDateTime
+    dc["endDateTime"] = endDateTime
     dc.update(config)
 
-    data = load_data(dc['loader_config'])
-    
-    # Change to timezone aware timestamp
-    data.index = pd.to_datetime(data.index, unit='s')
-    data.index = pd.Series(data.index).dt.tz_localize('UTC')
-    data.index = pd.Series(data.index).dt.tz_convert(dc['script_config']['timezone'])
+    data = load_data(dc["loader_config"])
 
-    write_data(data, dc['writer_config'])
+    # Change to timezone aware timestamp
+    data.index = pd.to_datetime(data.index, unit="s")
+    data.index = pd.Series(data.index).dt.tz_localize("UTC")
+    data.index = pd.Series(data.index).dt.tz_convert(dc["script_config"]["timezone"])
+
+    write_data(data, dc["writer_config"])
 
     return
 
