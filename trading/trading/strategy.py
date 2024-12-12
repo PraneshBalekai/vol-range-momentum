@@ -54,9 +54,8 @@ def load_noise_area(
     )  # see pg.14 on the paper
     daily_data["sigma"] = np.nan
 
-    for window in daily_data.rolling(
-        lookback_days + 2
-    ):  # last row is 't', the window's first row pct_change == NaN, so we add +2.
+    # last row is 't', the window's first row pct_change == NaN, so we add +2.
+    for window in daily_data.rolling(lookback_days + 2):
         if len(window) < (lookback_days + 2):
             continue
         sigma = (
@@ -72,9 +71,8 @@ def load_noise_area(
     # calculat avg move
     df["move"] = ((df["close"] / df["day_open"]) - 1).abs()
 
-    avg_move = pd.pivot_table(
-        df, "move", index="date", columns="minute"
-    ).ffill()  # ffill to fill up data for those days where market closes at 13:00
+    # ffill to fill up data for those days where market closes at 13:00
+    avg_move = pd.pivot_table(df, "move", index="date", columns="minute").ffill()
     avg_move = avg_move.rolling(lookback_days, min_periods=lookback_days).mean()
     latest_avg = avg_move[-lookback_days:].mean()
 

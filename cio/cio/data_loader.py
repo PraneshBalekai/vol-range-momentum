@@ -5,6 +5,7 @@ import time
 from abc import ABC, abstractmethod
 
 import pandas as pd
+from ibapi.contract import Contract
 
 import cio.constants as c
 import external.ibkr as ibkr
@@ -89,7 +90,8 @@ class IBKRHistoricalDataLoader(BaseLoader):
             Args:
                 reqId (int): Unique ID passed to identify IBKR contract that data is for
                 bar (IBKR bar): Has fields
-                Date: 12345678, Open: 222.97, High: 222.97, Low: 222.96, Close: 222.97, Volume: 300, WAP: 222.965, BarCount: 2
+                Date: 12345678, Open: 222.97, High: 222.97, Low: 222.96,
+                    Close: 222.97, Volume: 300, WAP: 222.965, BarCount: 2
             """
             df = {}
             bar_data = {
@@ -122,7 +124,7 @@ class IBKRHistoricalDataLoader(BaseLoader):
         # Send Query
         ibkr_params = self.config["ibkr_params"]
         ibkr_params["reqId"] = app.nextId()
-        ibkr_params["contract"] = ibkr.Contract()
+        ibkr_params["contract"] = Contract()
         for k, v in self.config["contract"].items():
             setattr(ibkr_params["contract"], k, v)
         app.reqHistoricalData(**ibkr_params)
