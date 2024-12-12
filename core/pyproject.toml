@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "core"
+version = "0.1.0"
+description = "Core module that can be used for technical analysis"
+authors = ["pranesh <praneshbalekai@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+dynaconf = "^3.2.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120

@@ -1,0 +1,33 @@
+{
+    "loader_config": {
+            "loader_class": "IBKRHistoricalDataLoader",
+            "contract": {
+                "symbol": "SPY",
+                "secType": "STK",
+                "exchange": "SMART",
+                "currency": "USD"
+            },
+            "ibkr_params": {
+                "endDateTime": "@format {this.endDateTime} 09:30:00 US/Eastern",
+                "durationStr": "5 D",
+                "barSizeSetting": "1 min",
+                "whatToShow": "TRADES",
+                "useRTH": true,
+                "formatDate": 2,
+                "keepUpToDate": false,
+                "chartOptions": []
+            }
+    },
+    "script_config": {
+        "timezone": "US/Eastern"
+    },
+    "writer_config": {
+        "writer_class": "ParquetWriter",
+        "filename": "/Users/praneshbalekai/Desktop/IB_PRD/data/spy_mins.parquet",
+        "writer_params": {
+            "append_if_exists": true,
+            "sort_index": true,
+            "deduplicate_index": true
+        }
+    }
+}
