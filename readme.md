@@ -1,2 +1,2 @@
-Link to jugaad trader hitorical data download example
-https://github.com/Riddhishah1008/Trading_Projects/blob/master/Customisable_Strategy_with_Trading_Engine/Zerodha.py
+# Intraday Momentum Strategy on US ETF
+## Based on Rolling Avg. Move intraday
