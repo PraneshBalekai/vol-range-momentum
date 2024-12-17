@@ -72,9 +72,11 @@ def load_noise_area(
     df["move"] = ((df["close"] / df["day_open"]) - 1).abs()
 
     # ffill to fill up data for those days where market closes at 13:00
-    avg_move = pd.pivot_table(df, "move", index="date", columns="minute").ffill()
-    avg_move = avg_move.rolling(lookback_days, min_periods=lookback_days).mean()
-    latest_avg = avg_move[-lookback_days:].mean()
+    pivoted_table = pd.pivot_table(df, "move", index="date", columns="minute").ffill()
+    avg_move = (
+        pivoted_table.rolling(lookback_days, min_periods=lookback_days).mean().shift()
+    )
+    latest_avg = pivoted_table[-lookback_days:].mean()
 
     avg_move = pd.melt(
         avg_move.reset_index(),
