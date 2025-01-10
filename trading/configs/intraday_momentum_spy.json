@@ -1,7 +1,7 @@
 {
     "historical_data": {
         "loader_class": "ParquetDataFrameLoader",
-        "filename": "/Users/praneshbalekai/Desktop/IB_PRD/data/spy_mins.parquet"
+        "filename": "/app/data/spy_mins.parquet"
     },
     "strategy": {
         "lookback_days": 20,

@@ -1,0 +1,6 @@
+services:
+  trade_engine:
+    build:
+      context: .
+      dockerfile: trading.Dockerfile
+    network_mode: host

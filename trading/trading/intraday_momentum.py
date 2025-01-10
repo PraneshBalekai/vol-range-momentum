@@ -16,7 +16,13 @@ from cio.data_loader import load_data
 from core.strategy import load_noise_area
 
 parser = argparse.ArgumentParser(description="Path of config file to pass to script")
-parser.add_argument("-c", "--config_path", type=str, help="Path to config file")
+parser.add_argument("-c", "--config-path", type=str, help="Path to config file")
+parser.add_argument(
+    "-d",
+    "--docker-run",
+    action=argparse.BooleanOptionalAction,
+    help="Flag to set if this script is run in docker",
+)
 
 
 class IntradayMomentum(ibkr.IBBaseApp):
@@ -119,7 +125,7 @@ class IntradayMomentum(ibkr.IBBaseApp):
                 self.mins[dt]["close"] = price
                 self.mins[dt]["low"] = price
                 self.mins[dt]["high"] = price
-    
+
     def tickSize(self, reqId, tickType, size):
         # tick type 71, delayed last size
         if tickType == 71:
@@ -127,13 +133,13 @@ class IntradayMomentum(ibkr.IBBaseApp):
             dt = dt.replace(second=0, microsecond=0)
 
             if dt in self.mins:
-                if 'volume' in self.mins[dt]:
-                    self.mins[dt]['volume'] += size
+                if "volume" in self.mins[dt]:
+                    self.mins[dt]["volume"] += size
                 else:
-                    self.mins[dt]['volume'] = size
+                    self.mins[dt]["volume"] = size
             elif dt not in self.mins:
                 self.mins[dt] = {}
-                self.mins[dt]['volume'] = size
+                self.mins[dt]["volume"] = size
 
     def load_strategy_limits(self):
         if self.current_limits is None:
@@ -157,7 +163,7 @@ class IntradayMomentum(ibkr.IBBaseApp):
             close=("close", "last"),
             high=("high", "max"),
             low=("low", "min"),
-            volume=("volume", "sum")
+            volume=("volume", "sum"),
         )
 
     def init_historical_data_to_strategy(self):
@@ -182,7 +188,7 @@ def custom_sched(app: IntradayMomentum):
         time.sleep(1)
 
 
-def main(config_path: str):
+def main(config_path: str, is_docker_run: bool):
     """
     Example Config:
     {
@@ -211,8 +217,10 @@ def main(config_path: str):
     config = open(config_path)
     config = json.load(config)
 
+    host = "host.docker.internal" if is_docker_run else "127.0.0.1"
+
     app = IntradayMomentum(config)
-    app.connect("127.0.0.1", 4002, clientId=1)
+    app.connect(host, 4002, clientId=1)
 
     threading.Thread(target=app.run).start()
     time.sleep(1)
@@ -234,4 +242,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(f"Input args: {args.__dict__}")
 
-    main(args.config_path)
+    main(args.config_path, args.docker_run)
