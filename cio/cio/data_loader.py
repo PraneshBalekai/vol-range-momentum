@@ -3,11 +3,14 @@ from __future__ import annotations
 import threading
 import time
 from abc import ABC, abstractmethod
+from urllib.parse import urlencode
 
 import pandas as pd
+import requests
 from ibapi.contract import Contract
 
 import cio.constants as c
+import external.binance as binance
 import external.ibkr as ibkr
 
 
@@ -42,6 +45,44 @@ class ParquetDataFrameLoader(BaseLoader):
     def load_data(self):
         data = pd.read_parquet(self.config["filename"])
         return data
+
+
+class BinanceHistoricalDataLoader(BaseLoader):
+    """Loads historicla data from Binance Marketdata endpoint.
+
+    Example config:
+    {
+        "loader_class": "BinanceHistoricalDataLoader",
+        "endpoint_type": "SECURE" # SECURE / None
+        "params": {
+            "symbol": "BTCUSDT",
+            "interval": "1m",
+            "startTime": "1745769121",
+            "endTime": "1745769121",
+        }
+    }
+    """
+
+    def load_data(self):
+        endpoint = "/api/v3/klines"
+        query_string = urlencode(self.config["params"])
+
+        signature = None
+        if "endpoint_type" in self.config and self.config["endpoint_type"] == "SECURE":
+            signature = binance.get_query_signature(query_string)
+
+        if signature is None:
+            url = f"{binance.BASE_URL}{endpoint}?{query_string}"
+        else:
+            url = f"{binance.BASE_URL}{endpoint}?{query_string}&signature={signature}"
+
+        response = requests.get(url, headers=binance.DEFAULT_HEADERS)
+
+        response.raise_for_status()
+
+        # convert into DF
+        # Timezone aware datetime index
+        # required fields: close, open, low, high, volume, count
 
 
 class IBKRHistoricalDataLoader(BaseLoader):

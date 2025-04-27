@@ -127,6 +127,7 @@ class IntradayMomentum(ibkr.IBBaseApp):
                 self.mins[dt]["high"] = price
 
     def tickSize(self, reqId, tickType, size):
+        # TODO: Change this to real time last price once we switch to paid subscription.
         # tick type 71, delayed last size
         if tickType == 71:
             dt = datetime.datetime.now(datetime.timezone.utc)
