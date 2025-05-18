@@ -53,7 +53,7 @@ class BinanceHistoricalDataLoader(BaseLoader):
     Example config:
     {
         "loader_class": "BinanceHistoricalDataLoader",
-        "endpoint_type": "SECURE" # SECURE / None
+        "endpoint_type": None # KEY | SIGNATURE
         "params": {
             "symbol": "BTCUSDT",
             "interval": "1m",
@@ -67,8 +67,12 @@ class BinanceHistoricalDataLoader(BaseLoader):
         endpoint = "/api/v3/klines"
         query_string = urlencode(self.config["params"])
 
+        # TODO: endpoint_type == "KEY"
         signature = None
-        if "endpoint_type" in self.config and self.config["endpoint_type"] == "SECURE":
+        if (
+            "endpoint_type" in self.config
+            and self.config["endpoint_type"] == "SIGNATURE"
+        ):
             signature = binance.get_query_signature(query_string)
 
         if signature is None:
@@ -81,8 +85,30 @@ class BinanceHistoricalDataLoader(BaseLoader):
         response.raise_for_status()
 
         # convert into DF
+        df = pd.DataFrame(
+            response.json(),
+            columns=[
+                "kline_open_time",
+                "open_price",
+                "high_price",
+                "low_price",
+                "close_price",
+                "volume",
+                "kline_close_time",
+                "quote_asset_volume",
+                "number_of_trades",
+                "taker_buy_base_asset_volume",
+                "taker_buy_quote_asset_volume",
+                "NIL",
+            ],
+        )
+
+        # Do the following in the ETL script. Save copy of raw data.
         # Timezone aware datetime index
         # required fields: close, open, low, high, volume, count
+
+        # Return raw data
+        return df
 
 
 class IBKRHistoricalDataLoader(BaseLoader):
@@ -190,6 +216,8 @@ def load_data(config: dict):
         loader = ParquetDataFrameLoader(config)
     elif source == "IBKRHistoricalDataLoader":
         loader = IBKRHistoricalDataLoader(config)
+    elif source == "BinanceHistoricalDataLoader":
+        loader = BinanceHistoricalDataLoader(config)
     else:
         raise ValueError("Not a valid data source for data loader")
 
