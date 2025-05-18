@@ -1,9 +1,16 @@
 import hashlib
 import hmac
+import json
 
-from data.secrets.bnb_keys import API_KEY, API_SECRET
+# TODO: Get secrets path from args
+with open("/Users/praneshbalekai/Desktop/IB_PRD/data/secrets/bnb_keys.json", "r") as f:
+    secrets = json.load(f)
 
-BASE_URL = "https://api.binance.com"
+API_KEY = secrets["API_KEY"]
+API_SECRET = secrets["API_SECRET"]
+
+# BASE_URL = "https://api.binance.com"
+BASE_URL = "https://api-gcp.binance.com"
 
 DEFAULT_HEADERS = {"X-MBX-APIKEY": API_KEY}
 
