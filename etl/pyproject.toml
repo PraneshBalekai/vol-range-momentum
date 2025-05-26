@@ -10,6 +10,10 @@ python = "^3.12"
 cio = { path = "../cio/", develop=true }
 external = { path = "../external/", develop=true }
 dynaconf = "^3.2.4"
+jinja2 = "^3.1.6"
+
+[tool.poetry.scripts]
+bnb_update = 'etl.script:update_historical_data_bnb'
 
 [build-system]
 requires = ["poetry-core"]
