@@ -9,6 +9,13 @@
 poetry run bnb_update \
 --config-path /Users/praneshbalekai/Desktop/IB_PRD/etl/configs/update_historical_bnb.json \
 --symbol BTCUSDT \
---start-date 2025-05-19 \
---end-date 2025-05-26
+--start-date 2025-05-26 \
+--end-date 2025-06-13
 """
+
+# // "contract": {
+# //     "symbol": "SPY",
+# //     "secType": "STK",
+# //     "exchange": "SMART",
+# //     "currency": "USD"
+# // }

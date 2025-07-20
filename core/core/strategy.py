@@ -77,6 +77,7 @@ def load_noise_area(
         pivoted_table.rolling(lookback_days, min_periods=lookback_days).mean().shift()
     )
     latest_avg = pivoted_table[-lookback_days:].mean()
+    latest_avg.index = pivoted_table.columns
 
     avg_move = pd.melt(
         avg_move.reset_index(),

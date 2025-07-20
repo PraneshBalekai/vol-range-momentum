@@ -12,6 +12,7 @@ cio = { path = "../cio/", develop=true }
 external = { path = "../external/", develop=true }
 core = { path = "../core/", develop=true }
 schedule = "^1.2.2"
+requests = "^2.32.4"
 
 [build-system]
 requires = ["poetry-core"]
