@@ -2,7 +2,6 @@
 import warnings
 
 from ibapi.client import EClient, OrderId
-from ibapi.contract import Contract
 from ibapi.wrapper import EWrapper
 
 warnings.filterwarnings("ignore")

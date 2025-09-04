@@ -3,10 +3,14 @@ from __future__ import annotations
 import threading
 import time
 from abc import ABC, abstractmethod
+from urllib.parse import urlencode
 
 import pandas as pd
+import requests
+from ibapi.contract import Contract
 
 import cio.constants as c
+import external.binance as binance
 import external.ibkr as ibkr
 
 
@@ -41,6 +45,70 @@ class ParquetDataFrameLoader(BaseLoader):
     def load_data(self):
         data = pd.read_parquet(self.config["filename"])
         return data
+
+
+class BinanceHistoricalDataLoader(BaseLoader):
+    """Loads historicla data from Binance Marketdata endpoint.
+
+    Example config:
+    {
+        "loader_class": "BinanceHistoricalDataLoader",
+        "endpoint_type": None # KEY | SIGNATURE
+        "params": {
+            "symbol": "BTCUSDT",
+            "interval": "1m",
+            "startTime": "1745769121",
+            "endTime": "1745769121",
+        }
+    }
+    """
+
+    def load_data(self):
+        endpoint = "/api/v3/klines"
+        query_string = urlencode(self.config["params"])
+
+        # TODO: endpoint_type == "KEY"
+        signature = None
+        if (
+            "endpoint_type" in self.config
+            and self.config["endpoint_type"] == "SIGNATURE"
+        ):
+            signature = binance.get_query_signature(query_string)
+
+        if signature is None:
+            url = f"{binance.BASE_URL}{endpoint}?{query_string}"
+        else:
+            url = f"{binance.BASE_URL}{endpoint}?{query_string}&signature={signature}"
+
+        response = requests.get(url, headers=binance.DEFAULT_HEADERS)
+
+        response.raise_for_status()
+
+        # convert into DF
+        df = pd.DataFrame(
+            response.json(),
+            columns=[
+                "kline_open_time",
+                "open_price",
+                "high_price",
+                "low_price",
+                "close_price",
+                "volume",
+                "kline_close_time",
+                "quote_asset_volume",
+                "number_of_trades",
+                "taker_buy_base_asset_volume",
+                "taker_buy_quote_asset_volume",
+                "NIL",
+            ],
+        )
+
+        # Do the following in the ETL script. Save copy of raw data.
+        # Timezone aware datetime index
+        # required fields: close, open, low, high, volume, count
+
+        # Return raw data
+        return df
 
 
 class IBKRHistoricalDataLoader(BaseLoader):
@@ -89,7 +157,8 @@ class IBKRHistoricalDataLoader(BaseLoader):
             Args:
                 reqId (int): Unique ID passed to identify IBKR contract that data is for
                 bar (IBKR bar): Has fields
-                Date: 12345678, Open: 222.97, High: 222.97, Low: 222.96, Close: 222.97, Volume: 300, WAP: 222.965, BarCount: 2
+                Date: 12345678, Open: 222.97, High: 222.97, Low: 222.96,
+                    Close: 222.97, Volume: 300, WAP: 222.965, BarCount: 2
             """
             df = {}
             bar_data = {
@@ -122,7 +191,7 @@ class IBKRHistoricalDataLoader(BaseLoader):
         # Send Query
         ibkr_params = self.config["ibkr_params"]
         ibkr_params["reqId"] = app.nextId()
-        ibkr_params["contract"] = ibkr.Contract()
+        ibkr_params["contract"] = Contract()
         for k, v in self.config["contract"].items():
             setattr(ibkr_params["contract"], k, v)
         app.reqHistoricalData(**ibkr_params)
@@ -147,6 +216,8 @@ def load_data(config: dict):
         loader = ParquetDataFrameLoader(config)
     elif source == "IBKRHistoricalDataLoader":
         loader = IBKRHistoricalDataLoader(config)
+    elif source == "BinanceHistoricalDataLoader":
+        loader = BinanceHistoricalDataLoader(config)
     else:
         raise ValueError("Not a valid data source for data loader")
 

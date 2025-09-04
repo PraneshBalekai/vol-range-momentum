@@ -1,0 +1,26 @@
+{
+    "historical_data": {
+        "loader_class": "ParquetDataFrameLoader",
+        "filename": "/Users/praneshbalekai/Desktop/IB_PRD/data/spy_mins.parquet"
+    },
+    "strategy": {
+        "capital": 10000,
+        "max_leverage": 3,
+        "volatility_target": 0.02,
+        "lookback_days": 20,
+        "volatility_multiplier": 1,
+        "iana_timezone": "US/Eastern"
+    },
+    "ibkr_params": {
+        "genericTickList": "",
+        "snapshot": false,
+        "regulatorySnapshot": false,
+        "mktDataOptions": []
+    },
+    "contract": {
+        "symbol": "SPY",
+        "secType": "STK",
+        "exchange": "SMART",
+        "currency": "USD"
+    }
+}

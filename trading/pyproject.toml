@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "trading"
+version = "0.1.0"
+description = "trading module that can be used for real-time work"
+authors = ["pranesh <praneshbalekai@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+dynaconf = "^3.2.4"
+cio = { path = "../cio/", develop=true }
+external = { path = "../external/", develop=true }
+core = { path = "../core/", develop=true }
+schedule = "^1.2.2"
+requests = "^2.32.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120

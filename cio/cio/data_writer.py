@@ -44,6 +44,7 @@ class ParquetWriter(BaseWriter):
                 "append_if_exists" in self.config["writer_params"]
                 and self.config["writer_params"]["append_if_exists"]
             ):
+                # TODO: For this, assert existing data.schema == new data.schema
                 if os.path.isfile(self.config["filename"]):
                     df = pd.read_parquet(self.config["filename"])
                     data = pd.concat([df, data])
@@ -56,7 +57,7 @@ class ParquetWriter(BaseWriter):
                 "deduplicate_index" in self.config["writer_params"]
                 and self.config["writer_params"]["deduplicate_index"]
             ):
-                data = data[~data.index.duplicated(keep="first")]
+                data = data[~data.index.duplicated(keep="last")]
 
         data.to_parquet(self.config["filename"])
 

@@ -1,0 +1,22 @@
+{
+    "loader_config": {
+        "loader_class": "BinanceHistoricalDataLoader",
+        "endpoint_type": null,
+        "params": {
+            "symbol": "@format {this.symbol}",
+            "interval": "1m",
+            "startTime": "@format {this.startTime}",
+            "endTime": "@format {this.endTime}",
+            "limit":1000
+        }
+    },
+    "writer_config": {
+        "writer_class": "ParquetWriter",
+        "filename": "@jinja /Users/praneshbalekai/Desktop/IB_PRD/data/{{this.symbol.lower()}}_mins_proc_1.parquet",
+        "writer_params": {
+            "append_if_exists": true,
+            "sort_index": true,
+            "deduplicate_index": true
+        }
+    }
+}
