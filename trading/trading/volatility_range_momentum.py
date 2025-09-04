@@ -364,7 +364,7 @@ def main(config_path: str, is_docker_run: bool):
     ).start()
     time.sleep(1)
 
-    # Gotta start paper trading with delayed data
+    # Gotta start paper trading soon
     app.reqMarketDataType(3)
     app.reqMktData(**ibkr_params)
 

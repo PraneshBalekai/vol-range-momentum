@@ -2,9 +2,8 @@ import hashlib
 import hmac
 import json
 
-# TODO: Get secrets path from args
 with open(
-    "/Users/praneshbalekai/Desktop/IB_PRD/data/vault_secrets/bnb_keys.json", "r"
+    "vault_secrets/bnb_keys.json", "r"
 ) as f:
     secrets = json.load(f)
 
